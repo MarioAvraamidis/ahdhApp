@@ -13,8 +13,12 @@ import LoadingView from "@/components/loading-view"
 import Footer from "@/components/footer"
 import Logo from "@/components/logo"
 import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const ai = new GoogleGenAI({ apiKey: "AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc" });
+const genAI = new GoogleGenerativeAI("AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc");
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
+
 
 export default function Home() {
   const [inputValue, setInputValue] = useState("")
@@ -35,14 +39,16 @@ export default function Home() {
   }
 
   const handleBreakdown = async () => {
-    const prompt = "Explain the concept of Occam's Razor and provide a simple, everyday example.";
-
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro-preview-06-05",
-      contents: prompt,
-    });
-
-    console.log(response.text);
+    const result = await model.generateContent([
+        "Please summarize the video in 3 sentences.",
+        {
+          fileData: {
+            fileUri: inputValue,
+            mimeType:""
+          },
+        },
+    ]);
+    console.log(result.response.text());
 
     if ((inputValue.trim() && !uploadType) || (uploadType === "text" && textInput.trim()) || uploadType) {
       // Determine the content source
