@@ -72,6 +72,38 @@ Markdown(response.text)
 
 import pathlib
 import ffmpeg
+
+def process_audio(
+    audio_path: str | pathlib.Path,
+    prompt: str = "Break down the audio",
+    model_id: str = MODEL_ID,
+) -> str:
+    """
+    Παίρνει τοπικό αρχείο ήχου, το ανεβάζει στο Gemini
+    και επιστρέφει την απόκριση κειμένου.
+    """
+    audio_path = pathlib.Path(audio_path).expanduser().resolve()
+
+    if not audio_path.exists():
+        raise FileNotFoundError(f"Δεν βρέθηκε το αρχείο: {audio_path}")
+
+    # 1) εξασφαλίζουμε MP4
+    mp4_path = _ensure_mp4(audio_path)
+
+    # 2) upload
+    file_part = client.files.upload(file=mp4_path)
+
+    # 3) κλήση μοντέλου
+    resp = client.models.generate_content(
+        model=model_id,
+        contents=[
+            file_part,
+            prompt,
+        ],
+        # προαιρετικά: response_mime_type="text/plain"
+    )
+    return resp.text
+   
 # 1. Δείχνεις το δικό σου αρχείο
 input_path  = pathlib.Path("20250613_101417.m4a")
 
