@@ -104,19 +104,3 @@ def process_audio(
     )
     return resp.text
    
-# 1. Δείχνεις το δικό σου αρχείο
-input_path  = pathlib.Path("20250613_101417.m4a")
-
-# 3. Upload στο Gemini
-file_part = client.files.upload(file=input_path)
-
-# Ask Gemini about the video
-response = client.models.generate_content(
-    model=MODEL_ID,
-    contents=[
-        file_part,
-        "Break down the audio",
-    ]
-)
-
-Markdown(response.text)
