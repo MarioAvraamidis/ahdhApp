@@ -10,8 +10,7 @@ import {
   createPartFromUri,
 } from "@google/genai";
 export let video_file: File | null = null
-
-const ai = new GoogleGenAI({ apiKey: "AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc" });
+import {runGemini} from "@/lib/gemini";
 
 
 interface UploadVideoProps {
@@ -21,41 +20,6 @@ interface UploadVideoProps {
 export default function UploadVideo({ onBack }: UploadVideoProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [file, setFile] = useState<File | null>(null)
-
-  async function runGemini(f: File) {
-    try {
-        const myfile = await ai.files.upload({
-          file: f,
-          config: { mimeType: "video/mp4" },
-        });
-
-        let info = myfile;                               // first response
-        while (info.state !== "ACTIVE") {
-          // tiny pause (2 s is usually enough for <100 MB files)
-          await new Promise(r => setTimeout(r, 2000));
-          console.log("File status:", info.state);
-          // ask the service for the current status
-          info = await ai.files.get({ name: info.name! });      // or info.refresh()
-          if (info.state === "FAILED") {
-            throw new Error(`upload failed (${info.state})`);
-          }
-        }
-
-      const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
-        contents: createUserContent([
-          createPartFromUri(myfile.uri!, myfile.mimeType!),
-          "Summarize this video",
-        ]),
-      });
-
-      console.log(response.text);
-      /*  If you want to show it in the UI, add a new piece
-          of state (e.g. setSummary(resp.text)) here. */
-    } catch (err) {
-      console.error("Gemini error:", err);
-    }
-  }
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -75,7 +39,7 @@ export default function UploadVideo({ onBack }: UploadVideoProps) {
       if (droppedFile.type.startsWith("video/")) {
         setFile(droppedFile)
         console.log("Drop File:", droppedFile);
-        runGemini(droppedFile)
+        runGemini(droppedFile , "Video");
       }
     }
   }
@@ -85,8 +49,7 @@ export default function UploadVideo({ onBack }: UploadVideoProps) {
       setFile(e.target.files[0])
       video_file  = e.target.files[0]
       setFile(video_file);
-      console.log("Handle File:", video_file);
-      runGemini(video_file);
+      runGemini(video_file , "Video");
     }
     
   }
