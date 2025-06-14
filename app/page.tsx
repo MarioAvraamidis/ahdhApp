@@ -42,7 +42,7 @@ export default function Home() {
 
   const handleBreakdown = async () => {
     const result = await model.generateContent([
-        "Please summarize the video in 3 sentences.",
+        "Please summarize the video in 3 sentences. After the summary, add 2 empty lines and then show in separate paragraphs the keypoints. Each keypoint should be 1-2 sentences. Your output should be a continuous text",
         {
           fileData: {
             fileUri: inputValue,

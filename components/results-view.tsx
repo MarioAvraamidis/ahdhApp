@@ -9,6 +9,13 @@ import ClientOnly from "@/components/client-only"
 import Logo from "@/components/logo"
 import { summaryText } from "@/app/page"
 
+let paragraphs = summaryText?.split('\n\n');
+let pars: string[] = [];
+if (paragraphs)
+  pars = paragraphs;
+const summary = pars[0];         // First paragraph is the summary
+const keypoints = pars.slice(1); // The rest are keypoints
+
 interface ResultsViewProps {
   onReset: () => void
   source?: "Text" | "URL" | "Image" | "Video" | "YouTube" | "Audio"
@@ -134,6 +141,26 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
           <TabsContent value="summary" className="space-y-3" data-tab="summary">
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-gray-800 text-sm">
+                {summary}
+              </p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="keypoints" className="space-y-3" data-tab="keypoints">
+            {keypoints.map((point, index) => (
+              <div key={index} className="bg-gray-50 p-4 rounded-lg flex items-start">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <span className="text-white text-xs font-bold">{index + 1}</span>
+                </div>
+                <p className="text-gray-800 text-sm">{point}</p>
+              </div>
+            ))}
+          </TabsContent>
+
+
+          {/* <TabsContent value="summary" className="space-y-3" data-tab="summary">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="text-gray-800 text-sm">
                  {summaryText}
               </p>
             </div>
@@ -186,7 +213,7 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
                 interesting.
               </p>
             </div>
-          </TabsContent>
+          </TabsContent> */}
 
         </Tabs>
 
