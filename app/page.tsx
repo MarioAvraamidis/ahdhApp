@@ -66,7 +66,7 @@ export default function Home() {
       console.log("🛑 Stopped recording");
 
       // ✅ 1. Create blob from recorded chunks
-      const audioBlob = new Blob([], { type: "audio/webm" });
+      const audioBlob = new Blob(chunks, { type: "audio/webm" });
       console.log('audioBlob: ', audioBlob)
 
 
@@ -95,6 +95,7 @@ export default function Home() {
 
       setInputValue(polling.text ?? ""); // Set the input value to the transcript text
     };
+
   }
 
   useEffect(() => {
@@ -142,6 +143,7 @@ export default function Home() {
 
   const handleMicClick = async () => {
     if (!isRecording) {
+
       await initMediaRecorder();
       mediaRecorder.current.start();
       setIsRecording(true);
