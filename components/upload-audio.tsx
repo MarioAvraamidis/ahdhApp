@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { X, Music } from "lucide-react"
+import { runGemini } from "@/lib/gemini"
 
 interface UploadAudioProps {
   onBack: () => void
@@ -36,7 +37,8 @@ export default function UploadAudio({ onBack }: UploadAudioProps) {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0])
+      setFile(e.target.files[0]);
+      runGemini(e.target.files[0], "Audio");
     }
   }
 
