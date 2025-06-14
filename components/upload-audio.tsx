@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { X, Music } from "lucide-react"
+export let mp3_file: File | null = null
 
 interface UploadAudioProps {
   onBack: () => void
@@ -37,6 +38,7 @@ export default function UploadAudio({ onBack }: UploadAudioProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0])
+      mp3_file = e.target.files[0]
     }
   }
 

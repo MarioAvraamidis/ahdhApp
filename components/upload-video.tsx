@@ -39,6 +39,10 @@ export default function UploadVideo({ onBack }: UploadVideoProps) {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0])
       video_file  = e.target.files[0]
+          console.log("Selected file:", file);
+    console.log("Name:", video_file.name);
+    console.log("Type:", video_file.type);
+    console.log("Size (bytes):", video_file.size);
     }
     
   }
