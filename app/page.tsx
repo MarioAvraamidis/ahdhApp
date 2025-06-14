@@ -1,46 +1,40 @@
 "use client"
 import { AssemblyAI } from "assemblyai";
-import { useState, useEffect } from "react"
-import { BookOpen, Headphones, Plus, ImageIcon, Video, Music, FileText } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { BookOpen, Headphones, Plus, ImageIcon, Video, Music, FileText, Mic, Square, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import UploadAudio from "@/components/upload-audio"
 import UploadImage from "@/components/upload-image"
+import VoiceRecorder from "@/components/upload-vocal"
 import UploadVideo from "@/components/upload-video"
+
 import TextInput from "@/components/text-input"
 import ResultsView from "@/components/results-view"
 import LoadingView from "@/components/loading-view"
 import Footer from "@/components/footer"
 import Logo from "@/components/logo"
-import { GoogleGenAI } from "@google/genai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import {video_file} from "@/components/upload-video"
 import {mp3_file} from "@/components/upload-audio"
-import { Mic, Square } from "lucide-react";
 import { set } from "date-fns";
 
+import {
+  createUserContent,
+  createPartFromUri,
+} from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc" });
 const genAI = new GoogleGenerativeAI("AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc");
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
 // save the summary text in a string to export it
 export let summaryText: string | null = null;
-
 // recordingState.ts
-
-
-
+export let title: string | null = null;
 
 export default function Home() {
-
-
-  
-const client = new AssemblyAI({
-  apiKey: "2834c14708c4428eb7dde1eea2234126",
-});
-  
-
-
+  const client = new AssemblyAI({
+    apiKey: "2834c14708c4428eb7dde1eea2234126",
+  });
 
   const [inputValue, setInputValue] = useState("")
   const [textInput, setTextInput] = useState("")
@@ -50,67 +44,58 @@ const client = new AssemblyAI({
   const [showMediaMenu, setShowMediaMenu] = useState(false)
   const [contentSource, setContentSource] = useState<"Text" | "URL" | "Image" | "Video" | "YouTube" | "Audio">("Text")
   const [mounted, setMounted] = useState(false)
+  const [stream, setStream] = useState<null | MediaStream>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorder = useRef<MediaRecorder>(null);
+
+  // initialize mic
+  const initMediaRecorder = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    setStream(stream);
+    mediaRecorder.current = new MediaRecorder(stream, { mimeType: "audio/webm" });
+
+    const chunks: Blob[] = [];
+    mediaRecorder.current.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        chunks.push(e.data);
+      }
+    };
+
+    // add media Recorder Handlers
+    mediaRecorder.current.onstop = async () => {
+      console.log("🛑 Stopped recording");
+
+      // ✅ 1. Create blob from recorded chunks
+      const audioBlob = new Blob([], { type: "audio/webm" });
+      console.log('audioBlob: ', audioBlob)
 
 
+      // ✅ 2. Upload blob to AssemblyAI using SDK
+      const uploadUrl = await client.files.upload(audioBlob);
+      console.log('uploadUrl: ', uploadUrl)
 
-  
-const handleMicClick = async () => {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
-  const chunks: Blob[] = [];
+      // ✅ 3. Start transcription job
+      const transcript = await client.transcripts.create({
+        audio_url: uploadUrl,
+        speech_model: "universal"
+      });
 
+      // ✅ 4. Poll until done
+      let polling;
+      while (true) {
+        polling = await client.transcripts.get(transcript.id);
+        if (polling.status === "completed") break;
+        if (polling.status === "error") {
+          console.error("Transcription failed:", polling.error);
+          return;
+        }
+        await new Promise((r) => setTimeout(r, 1500)); // wait before retrying
+      }
+      console.log("✅ Transcript:", polling.text);
 
-  setIsRecording(true);
-
-  mediaRecorder.ondataavailable = (e) => {
-    if (e.data.size > 0) chunks.push(e.data);
-  };
-
-  mediaRecorder.onstop = async () => {
-    console.log("🛑 Stopped recording");
-
-    // ✅ 1. Create blob from recorded chunks
-    const audioBlob = new Blob(chunks, { type: "audio/webm" });
-
-    // ✅ 2. Upload blob to AssemblyAI using SDK
-    const uploadUrl = await client.files.upload(audioBlob);
-
-    // ✅ 3. Start transcription job
-    const transcript = await client.transcripts.create({
-      audio_url: uploadUrl,
-      speech_model: "universal"
-    });
-
-    // ✅ 4. Poll until done
-    let polling;
-while (true) {
-  polling = await client.transcripts.get(transcript.id);
-  if (polling.status === "completed") break;
-  if (polling.status === "error") {
-    console.error("Transcription failed:", polling.error);
-    return;
+      setInputValue(polling.text ?? ""); // Set the input value to the transcript text
+    };
   }
-  await new Promise((r) => setTimeout(r, 1500)); // wait before retrying
-}
-    console.log("✅ Transcript:", polling.text);
-
- setInputValue(polling.text ?? ""); // Set the input value to the transcript text
-  };
-
-  // ✅ Start recording
-
-    
-  mediaRecorder.start();
-
-
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-  setIsRecording(false);
-  mediaRecorder.stop();
-};
-
-
-
 
   useEffect(() => {
     setMounted(true)
@@ -121,6 +106,7 @@ while (true) {
   }
 
   const handleBreakdown = async () => {
+    setIsProcessing(true)
     const result = await model.generateContent([
         "Please summarize the video in 3 sentences.",
         {
@@ -131,8 +117,6 @@ while (true) {
         },
     ]);
     console.log(result.response.text());
-    // save the summary text
-    summaryText = result.response.text();
 
     if ((inputValue.trim() && !uploadType) || (uploadType === "text" && textInput.trim()) || uploadType) {
       // Determine the content source
@@ -155,6 +139,17 @@ while (true) {
       }, 2000)
     }
   }
+
+  const handleMicClick = async () => {
+    if (!isRecording) {
+      await initMediaRecorder();
+      mediaRecorder.current.start();
+      setIsRecording(true);
+    } else {
+      mediaRecorder.current.stop();
+      setIsRecording(false);
+    }
+  };
 
   const resetView = () => {
     setInputValue("")
@@ -202,92 +197,102 @@ while (true) {
             </div>
           </div>
 
-          {/* Input area */}
-          {uploadType === null ? (
-            <div className="relative mb-3">
-              <Input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Paste URL and wait"
-                className="pr-10 py-6 bg-white border-gray-200 text-black"
-              />
-  {/* Mic icon (right side, left of +) */}
-<button
-  onClick={handleMicClick}
-  className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black"
-  title="Record audio"
->
-    {isRecording ? (
-    <Square className="w-5 h-5" />
-  ) : (
-    <Mic className="w-5 h-5" />
-  )}
-</button>
-              <button
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 -mr-2"
-                onClick={toggleMediaMenu}
-                aria-label="Show media options"
-              >
-                <Plus className="w-4 h-4 text-gray-400" />
-              </button>
-            </div>
-          ) : uploadType === "audio" ? (
-            <UploadAudio onBack={() => setUploadType(null)} />
-          ) : uploadType === "image" ? (
-            <UploadImage onBack={() => setUploadType(null)} />
-          ) : uploadType === "video" ? (
-            <UploadVideo onBack={() => setUploadType(null)} />
-          ) : (
-            <TextInput onBack={() => setUploadType(null)} onTextChange={setTextInput} initialText={textInput} />
-          )}
+              {/* Input area */}
+{uploadType === null ? (
+  <div className="relative mb-3">
+    <Input
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
+      placeholder="Paste URL and wait"
+      className="pr-10 py-6 bg-white border-gray-200 text-black"
+    />
+    {/* Mic icon (right side, left of +) */}
+    <button
+      onClick={handleMicClick}
+      className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black"
+      title="Record audio"
+    >
+        {isRecording ? (
+        <Square className="w-5 h-5" />
+      ) : (
+        <Mic className="w-5 h-5" />
+      )}
+    </button>
+    
+    {/* Button + Dropdown wrapper */}
+    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+      <button
+        className="p-2"
+        onClick={toggleMediaMenu}
+        aria-label="Show media options"
+      >
+        <Plus className="w-4 h-4 text-gray-400" />
+      </button>
 
-          {/* Upload options dropdown - only shown when + is clicked */}
-          {uploadType === null && showMediaMenu && (
-            <div className="absolute right-6 top-[210px] bg-white shadow-lg rounded-lg border border-gray-100 w-36 z-10">
-              <div className="p-1">
-                <button
-                  className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
-                  onClick={() => {
-                    setUploadType("text")
-                    setShowMediaMenu(false)
-                  }}
-                >
-                  <FileText className="w-5 h-5 text-gray-800" />
-                  <span className="text-sm">Text</span>
-                </button>
-                <button
-                  className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
-                  onClick={() => {
-                    setUploadType("audio")
-                    setShowMediaMenu(false)
-                  }}
-                >
-                  <Music className="w-5 h-5 text-gray-800" />
-                  <span className="text-sm">Audio</span>
-                </button>
-                <button
-                  className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
-                  onClick={() => {
-                    setUploadType("image")
-                    setShowMediaMenu(false)
-                  }}
-                >
-                  <ImageIcon className="w-5 h-5 text-gray-800" />
-                  <span className="text-sm">Image</span>
-                </button>
-                <button
-                  className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
-                  onClick={() => {
-                    setUploadType("video")
-                    setShowMediaMenu(false)
-                  }}
-                >
-                  <Video className="w-5 h-5 text-gray-800" />
-                  <span className="text-sm">Video</span>
-                </button>
-              </div>
-            </div>
-          )}
+      {/* Dropdown */}
+      {showMediaMenu && (
+        <div className="absolute bottom-full right-2 translate-x-40 mb-2 bg-white shadow-lg rounded-lg border border-gray-100 w-36 z-10">
+          <div className="p-1">
+            <button
+              className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
+              onClick={() => {
+                setUploadType("text");
+                setShowMediaMenu(false);
+              }}
+            >
+              <FileText className="w-5 h-5 text-gray-800" />
+              <span className="text-sm">Text</span>
+            </button>
+            <button
+              className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
+              onClick={() => {
+                setUploadType("audio");
+                setShowMediaMenu(false);
+              }}
+            >
+              <Music className="w-5 h-5 text-gray-800" />
+              <span className="text-sm">Audio</span>
+            </button>
+            <button
+              className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
+              onClick={() => {
+                setUploadType("video");
+                setShowMediaMenu(false);
+              }}
+            >
+              <Video className="w-5 h-5 text-gray-800" />
+              <span className="text-sm">Video</span>
+            </button>
+            <button
+  className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
+  onClick={() => {
+    setUploadType("record")
+    setShowMediaMenu(false)
+  }}
+>
+  <Mic className="w-5 h-5 text-gray-800" />
+  <span className="text-sm">Voice</span>
+</button>
+
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+  ) :  uploadType === "record" ? (
+    <VoiceRecorder onBack={() => setUploadType(null)} />
+  ) :
+  uploadType === "audio" ? (
+  <UploadAudio onBack={() => setUploadType(null)} />
+) : uploadType === "video" ? (
+  <UploadVideo onBack={() => setUploadType(null)} />
+) : (
+  <TextInput
+    onBack={() => setUploadType(null)}
+    onTextChange={setTextInput}
+    initialText={textInput}
+  />
+)}
 
           {/* Spacer to push button to middle */}
           <div className="flex-grow"></div>

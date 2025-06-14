@@ -4,7 +4,14 @@ import type React from "react"
 
 import { useState } from "react"
 import { X, Video } from "lucide-react"
+import {
+  GoogleGenAI,
+  createUserContent,
+  createPartFromUri,
+} from "@google/genai";
 export let video_file: File | null = null
+import {runGemini} from "@/lib/gemini";
+
 
 interface UploadVideoProps {
   onBack: () => void
@@ -23,7 +30,7 @@ export default function UploadVideo({ onBack }: UploadVideoProps) {
     setIsDragging(false)
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(false)
 
@@ -31,18 +38,17 @@ export default function UploadVideo({ onBack }: UploadVideoProps) {
       const droppedFile = e.dataTransfer.files[0]
       if (droppedFile.type.startsWith("video/")) {
         setFile(droppedFile)
+        console.log("Drop File:", droppedFile);
+        runGemini(droppedFile , "Video");
       }
     }
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0])
-      video_file  = e.target.files[0]
-          console.log("Selected file:", file);
-    console.log("Name:", video_file.name);
-    console.log("Type:", video_file.type);
-    console.log("Size (bytes):", video_file.size);
+      const video_file: File | null  = e.target.files[0]
+      setFile(video_file);
+      runGemini(video_file , "Video");
     }
     
   }
