@@ -24,6 +24,7 @@ import {
 
 const genAI = new GoogleGenerativeAI("AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc");
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
+export let summaryText: string | null = null;
 export let title: string | null = null;
 
 export default function Home() {
@@ -47,7 +48,7 @@ export default function Home() {
   const handleBreakdown = async () => {
     setIsProcessing(true)
     const result = await model.generateContent([
-        "Please summarize the video in 3 sentences.",
+        "Please summarize the video in 3 sentences. After the summary, add 2 empty lines and then show in separate paragraphs the keypoints. Each keypoint should be 1-2 sentences. Your output should be a continuous text",
         {
           fileData: {
             fileUri: inputValue,
@@ -55,6 +56,7 @@ export default function Home() {
           },
         },
     ]);
+    summaryText = result.response.text();
     console.log(result.response.text());
 
     if ((inputValue.trim() && !uploadType) || (uploadType === "text" && textInput.trim()) || uploadType) {

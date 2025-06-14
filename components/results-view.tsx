@@ -11,6 +11,7 @@ import { summaryText } from "@/app/page"
 import { title } from "@/app/page"
 import { jsPDF } from "jspdf"
 
+
 interface ResultsViewProps {
   onReset: () => void
   source?: "Text" | "URL" | "Image" | "Video" | "YouTube" | "Audio"
@@ -131,27 +132,31 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
             </div>
           </TabsContent>
   
+          
+          
+          
           <TabsContent value="keypoints" className="flex-1 overflow-y-auto space-y-3 pr-1" data-tab="keypoints">
-            {keypoints.map((point, index) => (
-              <div key={index} className="bg-gray-50 p-4 rounded-lg flex items-start">
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
-                  <span className="text-white text-m font-bold">{index + 1}</span>
-                </div>
-                <p className="text-2xl leading-7 flex flex-wrap">
-  {point.split(" ").map((word, i) => (
-    <span key={i} className="mr-1 flex">
-      <span className="font-bold text-gray-800">{word.charAt(0)}</span>
-      <span className="text-gray-500">{word.slice(1)}</span>
-    </span>
+  {keypoints.map((point, index) => (
+    <div key={index} className="bg-gray-50 p-4 rounded-lg flex items-start">
+      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+        <span className="text-white text-xs font-bold">{index + 1}</span>
+      </div>
+      <p className="text-2xl leading-7 flex flex-wrap">
+        {point.split(" ").map((word, i) => (
+          <span key={i} className="mr-1 flex">
+            <span className="font-bold text-gray-800">{word.charAt(0)}</span>
+            <span className="text-gray-500">{word.slice(1)}</span>
+          </span>
+        ))}
+      </p>
+    </div>
   ))}
-</p>
+</TabsContent>
 
-
-              </div>
-            ))}
-          </TabsContent>
         </Tabs>
   
+
+
         {/* Audio progress bar */}
         <ClientOnly>
           {isPlaying && (
