@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { BookOpen, Headphones, Plus, ImageIcon, Video, Music, FileText,Mic } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -62,15 +62,9 @@ export default function Home() {
       } else {
         setContentSource("URL")
       }
-
-      setIsProcessing(true)
-      setShowMediaMenu(false)
-      // Simulate processing delay
-      setTimeout(() => {
-        setIsProcessing(false)
-        setShowResults(true)
-      }, 2000)
     }
+    setIsProcessing(false)
+    setShowResults(true)
   }
 
   const resetView = () => {
