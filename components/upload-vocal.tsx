@@ -38,6 +38,8 @@ export default function VoiceRecorder({ onBack }: VoiceRecorderProps) {
   }
 
   const stopRecording = () => {
+
+    
     mediaRecorderRef.current?.stop()
     setIsRecording(false)
   }

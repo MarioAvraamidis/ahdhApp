@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { X, Music } from "lucide-react"
 import { runGemini } from "@/lib/gemini"
+export let mp3_file: File | null = null
 
 interface UploadAudioProps {
   onBack: () => void

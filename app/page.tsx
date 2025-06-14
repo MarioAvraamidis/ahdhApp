@@ -1,7 +1,7 @@
 "use client"
-
-import { useState, useEffect, useContext } from "react"
-import { BookOpen, Headphones, Plus, ImageIcon, Video, Music, FileText,Mic } from "lucide-react"
+import { AssemblyAI } from "assemblyai";
+import { useState, useEffect, useRef } from "react"
+import { BookOpen, Headphones, Plus, ImageIcon, Video, Music, FileText, Mic, Square, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import UploadAudio from "@/components/upload-audio"
@@ -18,6 +18,9 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import {runGemini} from "@/lib/gemini";
 
 import {video_file} from "@/components/upload-video"
+import {mp3_file} from "@/components/upload-audio"
+import { set } from "date-fns";
+
 import {
   createUserContent,
   createPartFromUri,
@@ -26,9 +29,14 @@ import {
 const genAI = new GoogleGenerativeAI("AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc");
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
 export let summaryText: string | null = null;
+// recordingState.ts
 export let title: string | null = null;
 
 export default function Home() {
+  const client = new AssemblyAI({
+    apiKey: "2834c14708c4428eb7dde1eea2234126",
+  });
+
   const [inputValue, setInputValue] = useState("")
   const [textInput, setTextInput] = useState("")
   const [uploadType, setUploadType] = useState<string | null>(null)
@@ -37,6 +45,59 @@ export default function Home() {
   const [showMediaMenu, setShowMediaMenu] = useState(false)
   const [contentSource, setContentSource] = useState<"Text" | "URL" | "Image" | "Video" | "YouTube" | "Audio">("Text")
   const [mounted, setMounted] = useState(false)
+  const [stream, setStream] = useState<null | MediaStream>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorder = useRef<MediaRecorder>(null);
+
+  // initialize mic
+  const initMediaRecorder = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    setStream(stream);
+    mediaRecorder.current = new MediaRecorder(stream, { mimeType: "audio/webm" });
+
+    const chunks: Blob[] = [];
+    mediaRecorder.current.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        chunks.push(e.data);
+      }
+    };
+
+    // add media Recorder Handlers
+    mediaRecorder.current.onstop = async () => {
+      console.log("🛑 Stopped recording");
+
+      // ✅ 1. Create blob from recorded chunks
+      const audioBlob = new Blob(chunks, { type: "audio/webm" });
+      console.log('audioBlob: ', audioBlob)
+
+
+      // ✅ 2. Upload blob to AssemblyAI using SDK
+      const uploadUrl = await client.files.upload(audioBlob);
+      console.log('uploadUrl: ', uploadUrl)
+
+      // ✅ 3. Start transcription job
+      const transcript = await client.transcripts.create({
+        audio_url: uploadUrl,
+        speech_model: "universal"
+      });
+
+      // ✅ 4. Poll until done
+      let polling;
+      while (true) {
+        polling = await client.transcripts.get(transcript.id);
+        if (polling.status === "completed") break;
+        if (polling.status === "error") {
+          console.error("Transcription failed:", polling.error);
+          return;
+        }
+        await new Promise((r) => setTimeout(r, 1500)); // wait before retrying
+      }
+      console.log("✅ Transcript:", polling.text);
+
+      setInputValue(polling.text ?? ""); // Set the input value to the transcript text
+    };
+
+  }
 
   useEffect(() => {
     setMounted(true)
@@ -66,6 +127,18 @@ export default function Home() {
     setIsProcessing(false)
     setShowResults(true)
   }
+
+  const handleMicClick = async () => {
+    if (!isRecording) {
+
+      await initMediaRecorder();
+      mediaRecorder.current.start();
+      setIsRecording(true);
+    } else {
+      mediaRecorder.current.stop();
+      setIsRecording(false);
+    }
+  };
 
   const resetView = () => {
     setInputValue("")
@@ -122,6 +195,18 @@ export default function Home() {
       placeholder="Paste URL and wait"
       className="pr-10 py-6 bg-white border-gray-200 text-black"
     />
+    {/* Mic icon (right side, left of +) */}
+    <button
+      onClick={handleMicClick}
+      className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black"
+      title="Record audio"
+    >
+        {isRecording ? (
+        <Square className="w-5 h-5" />
+      ) : (
+        <Mic className="w-5 h-5" />
+      )}
+    </button>
     
     {/* Button + Dropdown wrapper */}
     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
