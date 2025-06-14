@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { BookOpen, Headphones, Plus, ImageIcon, Video, Music, FileText } from "lucide-react"
+import { BookOpen, Headphones, Plus, ImageIcon, Video, Music, FileText , Mic} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import UploadAudio from "@/components/upload-audio"
 import UploadImage from "@/components/upload-image"
 import UploadVideo from "@/components/upload-video"
 import TextInput from "@/components/text-input"
+import VoiceRecorder from "@/components/upload-vocal"
 import ResultsView from "@/components/results-view"
 import LoadingView from "@/components/loading-view"
 import Footer from "@/components/footer"
@@ -172,13 +173,24 @@ export default function Home() {
             <button
               className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
               onClick={() => {
-                setUploadType("image");
+                setUploadType("video");
                 setShowMediaMenu(false);
               }}
             >
               <Video className="w-5 h-5 text-gray-800" />
               <span className="text-sm">Video</span>
             </button>
+            <button
+  className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
+  onClick={() => {
+    setUploadType("record")
+    setShowMediaMenu(false)
+  }}
+>
+  <Mic className="w-5 h-5 text-gray-800" />
+  <span className="text-sm">Voice</span>
+</button>
+
           </div>
         </div>
       )}
@@ -188,7 +200,10 @@ export default function Home() {
   <UploadAudio onBack={() => setUploadType(null)} />
 ) : uploadType === "video" ? (
   <UploadVideo onBack={() => setUploadType(null)} />
-) : (
+) :  uploadType === "record" ? (
+  <VoiceRecorder onBack={() => setUploadType(null)} />
+) :
+(
   <TextInput
     onBack={() => setUploadType(null)}
     onTextChange={setTextInput}
