@@ -32,6 +32,7 @@ export default function UploadAudio({ onBack }: UploadAudioProps) {
       const droppedFile = e.dataTransfer.files[0]
       if (droppedFile.type.startsWith("audio/")) {
         setFile(droppedFile)
+        runGemini(droppedFile, "Audio");
       }
     }
   }
