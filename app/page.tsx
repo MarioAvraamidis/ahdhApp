@@ -1,12 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { BookOpen, Headphones, Plus, ImageIcon, Video, Music, FileText } from "lucide-react"
+import { BookOpen, Headphones, Plus, ImageIcon, Video, Music, FileText,Mic } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import UploadAudio from "@/components/upload-audio"
 import UploadImage from "@/components/upload-image"
+import VoiceRecorder from "@/components/upload-vocal"
 import UploadVideo from "@/components/upload-video"
+
 import TextInput from "@/components/text-input"
 import ResultsView from "@/components/results-view"
 import LoadingView from "@/components/loading-view"
@@ -22,7 +24,7 @@ import {
 
 const genAI = new GoogleGenerativeAI("AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc");
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
-
+export let title: string | null = null;
 
 export default function Home() {
   const [inputValue, setInputValue] = useState("")
@@ -43,6 +45,7 @@ export default function Home() {
   }
 
   const handleBreakdown = async () => {
+    setIsProcessing(true)
     const result = await model.generateContent([
         "Please summarize the video in 3 sentences.",
         {
@@ -122,80 +125,90 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Input area */}
-          {uploadType === null ? (
-            <div className="relative mb-3">
-              <Input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Paste URL and wait"
-                className="pr-10 py-6 bg-white border-gray-200 text-black"
-              />
-              <button
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 -mr-2"
-                onClick={toggleMediaMenu}
-                aria-label="Show media options"
-              >
-                <Plus className="w-4 h-4 text-gray-400" />
-              </button>
-            </div>
-          ) : uploadType === "audio" ? (
-            <UploadAudio onBack={() => setUploadType(null)} />
-          ) : uploadType === "image" ? (
-            <UploadImage onBack={() => setUploadType(null)} />
-          ) : uploadType === "video" ? (
-            <UploadVideo onBack={() => setUploadType(null)} />
-          ) : (
-            <TextInput onBack={() => setUploadType(null)} onTextChange={setTextInput} initialText={textInput} />
-          )}
+              {/* Input area */}
+{uploadType === null ? (
+  <div className="relative mb-3">
+    <Input
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
+      placeholder="Paste URL and wait"
+      className="pr-10 py-6 bg-white border-gray-200 text-black"
+    />
+    
+    {/* Button + Dropdown wrapper */}
+    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+      <button
+        className="p-2"
+        onClick={toggleMediaMenu}
+        aria-label="Show media options"
+      >
+        <Plus className="w-4 h-4 text-gray-400" />
+      </button>
 
-          {/* Upload options dropdown - only shown when + is clicked */}
-          {uploadType === null && showMediaMenu && (
-            <div className="absolute right-6 top-[210px] bg-white shadow-lg rounded-lg border border-gray-100 w-36 z-10">
-              <div className="p-1">
-                <button
-                  className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
-                  onClick={() => {
-                    setUploadType("text")
-                    setShowMediaMenu(false)
-                  }}
-                >
-                  <FileText className="w-5 h-5 text-gray-800" />
-                  <span className="text-sm">Text</span>
-                </button>
-                <button
-                  className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
-                  onClick={() => {
-                    setUploadType("audio")
-                    setShowMediaMenu(false)
-                  }}
-                >
-                  <Music className="w-5 h-5 text-gray-800" />
-                  <span className="text-sm">Audio</span>
-                </button>
-                <button
-                  className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
-                  onClick={() => {
-                    setUploadType("image")
-                    setShowMediaMenu(false)
-                  }}
-                >
-                  <ImageIcon className="w-5 h-5 text-gray-800" />
-                  <span className="text-sm">Image</span>
-                </button>
-                <button
-                  className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
-                  onClick={() => {
-                    setUploadType("video")
-                    setShowMediaMenu(false)
-                  }}
-                >
-                  <Video className="w-5 h-5 text-gray-800" />
-                  <span className="text-sm">Video</span>
-                </button>
-              </div>
-            </div>
-          )}
+      {/* Dropdown */}
+      {showMediaMenu && (
+        <div className="absolute bottom-full right-2 translate-x-40 mb-2 bg-white shadow-lg rounded-lg border border-gray-100 w-36 z-10">
+          <div className="p-1">
+            <button
+              className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
+              onClick={() => {
+                setUploadType("text");
+                setShowMediaMenu(false);
+              }}
+            >
+              <FileText className="w-5 h-5 text-gray-800" />
+              <span className="text-sm">Text</span>
+            </button>
+            <button
+              className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
+              onClick={() => {
+                setUploadType("audio");
+                setShowMediaMenu(false);
+              }}
+            >
+              <Music className="w-5 h-5 text-gray-800" />
+              <span className="text-sm">Audio</span>
+            </button>
+            <button
+              className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
+              onClick={() => {
+                setUploadType("video");
+                setShowMediaMenu(false);
+              }}
+            >
+              <Video className="w-5 h-5 text-gray-800" />
+              <span className="text-sm">Video</span>
+            </button>
+            <button
+  className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
+  onClick={() => {
+    setUploadType("record")
+    setShowMediaMenu(false)
+  }}
+>
+  <Mic className="w-5 h-5 text-gray-800" />
+  <span className="text-sm">Voice</span>
+</button>
+
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+  ) :  uploadType === "record" ? (
+    <VoiceRecorder onBack={() => setUploadType(null)} />
+  ) :
+  uploadType === "audio" ? (
+  <UploadAudio onBack={() => setUploadType(null)} />
+) : uploadType === "video" ? (
+  <UploadVideo onBack={() => setUploadType(null)} />
+) : (
+  <TextInput
+    onBack={() => setUploadType(null)}
+    onTextChange={setTextInput}
+    initialText={textInput}
+  />
+)}
 
           {/* Spacer to push button to middle */}
           <div className="flex-grow"></div>
