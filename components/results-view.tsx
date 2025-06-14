@@ -126,23 +126,24 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
         {/* Content title */}
         <div className="mb-4">
           <h2 className="text-xl font-bold text-gray-800">Understanding ADHD Symptoms</h2>
-          <p className="text-sm text-gray-500">8 min read</p>
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="summary" className="mb-4" onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="summary">Summary</TabsTrigger>
-            <TabsTrigger value="keypoints">Key Points</TabsTrigger>
+          <TabsList className="flex justify-center gap-4 mb-4">
+          <TabsTrigger value="summary" className="px-4">Summary</TabsTrigger>
+          <TabsTrigger value="keypoints" className="px-4">Key Points</TabsTrigger>
+
           </TabsList>
 
           <TabsContent value="summary" className="space-y-3" data-tab="summary">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-gray-800 text-sm">
-                {summary}
+            <div className="bg-gray-30 p-4 rounded-lg">
+              <p className="text-gray-500 text-sm">
+                 {summaryText}
               </p>
             </div>
           </TabsContent>
+
 
           <TabsContent value="keypoints" className="space-y-3" data-tab="keypoints">
             {keypoints.map((point, index) => (
