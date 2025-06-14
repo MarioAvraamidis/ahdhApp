@@ -109,18 +109,44 @@ export default function Home() {
 
   const handleBreakdown = async () => {
     setIsProcessing(true)
+    let result;
 
     if ((inputValue.trim() && !uploadType) || (uploadType === "text" && textInput.trim()) || uploadType) {
       // Determine the content source
       if (uploadType === "text") {
         setContentSource("Text")
-      } else if (uploadType) {
-        setContentSource((uploadType.charAt(0).toUpperCase() + uploadType.slice(1)) as any)
+      //} else if (uploadType) {
+        //setContentSource((uploadType.charAt(0).toUpperCase() + uploadType.slice(1)) as any)
       } else if (inputValue.includes("youtube.com") || inputValue.includes("youtu.be")) {
         setContentSource("YouTube")
         const result = await runGemini(inputValue, "YouTube");
         summaryText = result
-      } else {
+      }
+      else if (uploadType === "audio")
+      {
+        // console.log("type audio");
+        if (mp3_file){
+          // console.log("mp3_file loaded");
+          result = await runGemini(mp3_file, "Audio");
+        }
+        if (result){
+          // console.log("result loaded");
+          summaryText = result;
+        }
+      }
+      else if (uploadType === "video")
+      {
+        // console.log("type audio");
+        if (video_file){
+          // console.log("mp3_file loaded");
+          result = await runGemini(video_file, "Video");
+        }
+        if (result){
+          // console.log("result loaded");
+          summaryText = result;
+        }
+      }
+       else {
         setContentSource("URL")
       }
     }

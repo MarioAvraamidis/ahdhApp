@@ -25,6 +25,7 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
   const [mounted, setMounted] = useState(false)
   let pars: string[] = []
   if (summaryText) pars = summaryText.split('\n\n\n')
+  const title = pars[0];
   const summary = pars[1];
   const keypoints = pars[2].split('\n\n');
 

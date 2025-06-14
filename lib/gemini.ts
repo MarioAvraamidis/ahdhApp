@@ -6,6 +6,9 @@ export let title: string | null = null;
 const genAI = new GoogleGenerativeAI("AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc");
 const ai = new GoogleGenAI({ apiKey: "AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc" });
 
+const audio_prompt = "Give a short title in the first line.Then add two line breaks.Then please summarize the audio file in 3 sentences. After the summary, add 2 empty lines and then show in separate paragraphs the keypoints. Each keypoint should be 1-2 sentences. Your output should be a continuous text. Don't use latex in your output, nor titles for keypoints. Only simple text";
+const video_prompt = "Give a short title for the video in the first line.Then add two line breaks.Then please summarize the video in 3 sentences. After the summary, add 2 empty lines and then show in separate paragraphs the keypoints. Each keypoint should be 1-2 sentences. Your output should be a continuous text. Don't use latex in your output, nor titles for keypoints. Only simple text";
+
 export async function runGemini(input: File | string, type: "Video" | "Audio" | "YouTube" ) {
     try {
         if (type === 'Video') {
@@ -30,11 +33,12 @@ export async function runGemini(input: File | string, type: "Video" | "Audio" | 
                 model: "gemini-2.5-pro-preview-06-05",
                 contents: createUserContent([ // to make this function argument
                     createPartFromUri(myfile.uri!, myfile.mimeType!),
-                    "Summarize this video",
+                    video_prompt,
                 ]),
             });
 
             console.log(response.text);
+            return response.text;
             /*  If you want to show it in the UI, add a new piece
                 of state (e.g. setSummary(resp.text)) here. */
         } else if (type === "Audio") {
@@ -47,14 +51,15 @@ export async function runGemini(input: File | string, type: "Video" | "Audio" | 
                 model: "gemini-2.5-pro-preview-06-05",
                 contents: createUserContent([
                     createPartFromUri(myfile.uri!, myfile.mimeType!),
-                    "Summarize this audio clip",
+                    audio_prompt,
                 ]),
             });
         console.log(response.text);
+        return response.text;
         } else if (type === "YouTube") {
             const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
             const result = await model.generateContent([
-                "Give a short title in the first line.Then add two line breaks.Then please summarize the video in 3 sentences. After the summary, add 2 empty lines and then show in separate paragraphs the keypoints. Each keypoint should be 1-2 sentences. Your output should be a continuous text",
+                video_prompt,
                 {
                     fileData: {
                         fileUri: input as string,

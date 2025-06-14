@@ -32,7 +32,7 @@ export default function UploadAudio({ onBack }: UploadAudioProps) {
       const droppedFile = e.dataTransfer.files[0]
       if (droppedFile.type.startsWith("audio/")) {
         setFile(droppedFile)
-        runGemini(droppedFile, "Audio");
+        // runGemini(droppedFile, "Audio");
       }
     }
   }
@@ -40,7 +40,8 @@ export default function UploadAudio({ onBack }: UploadAudioProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
-      runGemini(e.target.files[0], "Audio");
+      mp3_file = e.target.files[0];
+      // runGemini(e.target.files[0], "Audio");
     }
   }
 

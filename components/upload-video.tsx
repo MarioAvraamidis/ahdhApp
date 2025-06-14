@@ -39,16 +39,16 @@ export default function UploadVideo({ onBack }: UploadVideoProps) {
       if (droppedFile.type.startsWith("video/")) {
         setFile(droppedFile)
         console.log("Drop File:", droppedFile);
-        runGemini(droppedFile , "Video");
+        // runGemini(droppedFile , "Video");
       }
     }
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const video_file: File | null  = e.target.files[0]
+      video_file  = e.target.files[0]
       setFile(video_file);
-      runGemini(video_file , "Video");
+      // runGemini(video_file , "Video");
     }
     
   }
