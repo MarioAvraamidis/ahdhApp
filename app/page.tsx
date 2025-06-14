@@ -12,10 +12,14 @@ import ResultsView from "@/components/results-view"
 import LoadingView from "@/components/loading-view"
 import Footer from "@/components/footer"
 import Logo from "@/components/logo"
-import { GoogleGenAI } from "@google/genai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc" });
+import {video_file} from "@/components/upload-video"
+import {
+  createUserContent,
+  createPartFromUri,
+} from "@google/genai";
+
 const genAI = new GoogleGenerativeAI("AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc");
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
 
