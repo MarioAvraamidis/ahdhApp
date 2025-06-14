@@ -7,6 +7,7 @@ import { ArrowLeft, Download, Share2, Volume2, Pause } from "lucide-react"
 import Footer from "@/components/footer"
 import ClientOnly from "@/components/client-only"
 import Logo from "@/components/logo"
+import { summaryText } from "@/app/page"
 
 interface ResultsViewProps {
   onReset: () => void
@@ -139,27 +140,7 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
           <TabsContent value="summary" className="space-y-3" data-tab="summary">
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-gray-800 text-sm">
-                ADHD (Attention Deficit Hyperactivity Disorder) is a neurodevelopmental condition that affects focus,
-                impulse control, and activity levels. The video explains that ADHD exists on a spectrum and manifests
-                differently in each person. The three main types are predominantly inattentive, predominantly
-                hyperactive-impulsive, and combined type.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-gray-800 text-sm">
-                Common symptoms include difficulty maintaining attention, excessive fidgeting, impulsive decision
-                making, time blindness, and emotional dysregulation. The video emphasizes that ADHD is not a character
-                flaw but a difference in brain function, particularly in the prefrontal cortex which handles executive
-                functions.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-gray-800 text-sm">
-                Treatment options discussed include medication (stimulants and non-stimulants), cognitive behavioral
-                therapy, and lifestyle adjustments. The video concludes by highlighting the importance of early
-                diagnosis and proper support systems.
+                 {summaryText}
               </p>
             </div>
           </TabsContent>

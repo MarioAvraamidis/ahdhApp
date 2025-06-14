@@ -18,6 +18,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const ai = new GoogleGenAI({ apiKey: "AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc" });
 const genAI = new GoogleGenerativeAI("AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc");
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
+// save the summary text in a string to export it
+export let summaryText: string | null = null;
 
 
 export default function Home() {
@@ -49,6 +51,8 @@ export default function Home() {
         },
     ]);
     console.log(result.response.text());
+    // save the summary text
+    summaryText = result.response.text();
 
     if ((inputValue.trim() && !uploadType) || (uploadType === "text" && textInput.trim()) || uploadType) {
       // Determine the content source
