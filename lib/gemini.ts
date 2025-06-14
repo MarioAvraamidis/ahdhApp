@@ -9,7 +9,7 @@ const ai = new GoogleGenAI({ apiKey: "AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc" }
 const audio_prompt = "Give a short title in the first line.Then add two line breaks.Then please summarize the audio file in 3 sentences. After the summary, add 2 empty lines and then show in separate paragraphs the keypoints. Each keypoint should be 1-2 sentences. Your output should be a continuous text. Don't use latex in your output, nor titles for keypoints. Only simple text";
 const video_prompt = "Give a short title for the video in the first line.Then add two line breaks.Then please summarize the video in 3 sentences. After the summary, add 2 empty lines and then show in separate paragraphs the keypoints. Each keypoint should be 1-2 sentences. Your output should be a continuous text. Don't use latex in your output, nor titles for keypoints. Only simple text";
 
-export async function runGemini(input: File | string, type: "Video" | "Audio" | "YouTube" ) {
+export async function runGemini(input: File | string, type: "Video" | "Audio" | "YouTube"|"URL"| "Text") {
     try {
         if (type === 'Video') {
             const myfile = await ai.files.upload({
@@ -67,6 +67,21 @@ export async function runGemini(input: File | string, type: "Video" | "Audio" | 
                     },
                 },
             ]);
+            return result.response.text();
+        } else if (type === "URL") {
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
+            const result = await model.generateContent([
+               "Give a short title for the content of the URL in the first line.Then add two line breaks.Then please summarize the contents in 3 sentences. After the summary, add 2 empty lines and then show in separate paragraphs the keypoints. Each keypoint should be 1-2 sentences. Your output should be a continuous text. Don't use latex in your output, nor titles for keypoints. Only simple text. Use the following URL:\n" + input,
+    
+            ]);
+            return result.response.text();
+        } else if (type === "Text") {
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
+            const result = await model.generateContent([
+            "You are an assistant helping someone with ADHD break down their daily tasks. Given a list of tasks, split each one into smaller, manageable steps. Simplify complex actions, suggest helpful cues or reminders, and keep instructions clear and friendly. Focus on reducing overwhelm and making the day feel more doable. Break down and schedule the following tasks:\n" + input,
+               
+            ]);
+            console.log(result.response.text());
             return result.response.text();
         }
      } catch (err) {

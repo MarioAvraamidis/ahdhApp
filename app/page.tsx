@@ -113,14 +113,16 @@ export default function Home() {
 
     if ((inputValue.trim() && !uploadType) || (uploadType === "text" && textInput.trim()) || uploadType) {
       // Determine the content source
-      if (uploadType === "text") {
-        setContentSource("Text")
+     
       //} else if (uploadType) {
         //setContentSource((uploadType.charAt(0).toUpperCase() + uploadType.slice(1)) as any)
-      } else if (inputValue.includes("youtube.com") || inputValue.includes("youtu.be")) {
+      if (inputValue.includes("youtube.com") || inputValue.includes("youtu.be")) {
         setContentSource("YouTube")
         const result = await runGemini(inputValue, "YouTube");
         summaryText = result
+      }else if(inputValue.includes("http://") || inputValue.includes("https://") || inputValue.includes("www.")) {
+        setContentSource("URL")
+        const result = await runGemini(inputValue, "URL");
       }
       else if (uploadType === "audio")
       {
@@ -147,7 +149,8 @@ export default function Home() {
         }
       }
        else {
-        setContentSource("URL")
+        setContentSource("Text")
+        const result = await runGemini(inputValue , "Text")
       }
     }
     setIsProcessing(false)
@@ -218,7 +221,7 @@ export default function Home() {
     <Input
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
-      placeholder="Paste URL and wait"
+      placeholder="Provide a URL or list your tasks and wait"
       className="pr-10 py-6 bg-white border-gray-200 text-black"
     />
     {/* Mic icon (right side, left of +) */}
