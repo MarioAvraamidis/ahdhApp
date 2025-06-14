@@ -24,9 +24,9 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [mounted, setMounted] = useState(false)
   let pars: string[] = []
-  if (summaryText) pars = summaryText.split('\n\n')
-  const summary = pars[0]
-  const keypoints = pars.slice(1)
+  if (summaryText) pars = summaryText.split('\n\n\n')
+  const summary = pars[1];
+  const keypoints = pars[2].split('\n\n');
 
   useEffect(() => {
     setMounted(true)

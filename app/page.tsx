@@ -15,6 +15,7 @@ import LoadingView from "@/components/loading-view"
 import Footer from "@/components/footer"
 import Logo from "@/components/logo"
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import {runGemini} from "@/lib/gemini";
 
 import {video_file} from "@/components/upload-video"
 import {
@@ -47,17 +48,6 @@ export default function Home() {
 
   const handleBreakdown = async () => {
     setIsProcessing(true)
-    const result = await model.generateContent([
-        "Please summarize the video in 3 sentences. After the summary, add 2 empty lines and then show in separate paragraphs the keypoints. Each keypoint should be 1-2 sentences. Your output should be a continuous text",
-        {
-          fileData: {
-            fileUri: inputValue,
-            mimeType:""
-          },
-        },
-    ]);
-    summaryText = result.response.text();
-    console.log(result.response.text());
 
     if ((inputValue.trim() && !uploadType) || (uploadType === "text" && textInput.trim()) || uploadType) {
       // Determine the content source
@@ -67,6 +57,8 @@ export default function Home() {
         setContentSource((uploadType.charAt(0).toUpperCase() + uploadType.slice(1)) as any)
       } else if (inputValue.includes("youtube.com") || inputValue.includes("youtu.be")) {
         setContentSource("YouTube")
+        const result = await runGemini(inputValue, "YouTube");
+        summaryText = result
       } else {
         setContentSource("URL")
       }
