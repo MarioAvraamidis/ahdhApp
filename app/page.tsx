@@ -15,6 +15,10 @@ import Logo from "@/components/logo"
 import { GoogleGenAI } from "@google/genai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import {video_file} from "@/components/upload-video"
+import {
+  createUserContent,
+  createPartFromUri,
+} from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: "AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc" });
 const genAI = new GoogleGenerativeAI("AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc");
@@ -54,6 +58,7 @@ export default function Home() {
     console.log(result.response.text());
     // save the summary text
     summaryText = result.response.text();
+
 
     if ((inputValue.trim() && !uploadType) || (uploadType === "text" && textInput.trim()) || uploadType) {
       // Determine the content source
