@@ -2,7 +2,7 @@ import { GoogleGenAI,  createUserContent, createPartFromUri } from "@google/gena
 
 const ai = new GoogleGenAI({ apiKey: "AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc" });
 
-export async function runGemini(f: File, type: "Video" | "Audio" ) {
+export async function runGemini(f: File, type: "Video" | "Audio" | "URL" ) {
     try {
         if (type === 'Video') {
             const myfile = await ai.files.upload({
@@ -33,6 +33,8 @@ export async function runGemini(f: File, type: "Video" | "Audio" ) {
             console.log(response.text);
             /*  If you want to show it in the UI, add a new piece
                 of state (e.g. setSummary(resp.text)) here. */
+        } else if (type === "Audio") {
+
         }
     } catch (err) {
       console.error("run gemini error:", err);
