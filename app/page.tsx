@@ -22,7 +22,7 @@ const genAI = new GoogleGenerativeAI("AIzaSyAXdPmONpqOj5ItYG28ICTgyUBFj0wS2Tc");
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
 // save the summary text in a string to export it
 export let summaryText: string | null = null;
-
+export let title: string | null = null;
 
 export default function Home() {
   const [inputValue, setInputValue] = useState("")
@@ -46,7 +46,7 @@ export default function Home() {
 
     setIsProcessing(true) 
     const result = await model.generateContent([
-        "Please summarize the video in 3 sentences. After the summary, add 2 empty lines and then show in separate paragraphs the keypoints. Each keypoint should be 1-2 sentences. Your output should be a continuous text",
+        "Give a short title in the first line.Then add two line breaks.Then please summarize the video in 3 sentences. After the summary, add 2 empty lines and then show in separate paragraphs the keypoints. Each keypoint should be 1-2 sentences. Your output should be a continuous text",
         {
           fileData: {
             fileUri: inputValue,
@@ -56,7 +56,14 @@ export default function Home() {
     ]);
     console.log(result.response.text());
     // save the summary text
-    summaryText = result.response.text();
+
+    const fullText = await result.response.text();
+console.log(fullText);
+
+const parts = fullText.trim().split("\n\n");
+
+title = parts[0]; // ✅ First block = title
+summaryText = parts.slice(1).join("\n\n"); // ✅ Everything else = summary + keypoints
 
     if ((inputValue.trim() && !uploadType) || (uploadType === "text" && textInput.trim()) || uploadType) {
       // Determine the content source

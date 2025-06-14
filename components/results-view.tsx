@@ -8,6 +8,7 @@ import Footer from "@/components/footer"
 import ClientOnly from "@/components/client-only"
 import Logo from "@/components/logo"
 import { summaryText } from "@/app/page"
+import { title } from "@/app/page"
 
 interface ResultsViewProps {
   onReset: () => void
@@ -125,7 +126,7 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
 
         {/* Content title */}
         <div className="mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Understanding ADHD Symptoms</h2>
+          <h2 className="text-xl font-bold text-gray-800">{title}</h2>
         </div>
 
         {/* Tabs */}
