@@ -8,6 +8,7 @@ import Footer from "@/components/footer"
 import ClientOnly from "@/components/client-only"
 import Logo from "@/components/logo"
 import { summaryText } from "@/app/page"
+import { title } from "@/app/page"
 
 interface ResultsViewProps {
   onReset: () => void
@@ -20,6 +21,11 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
   const [audioProgress, setAudioProgress] = useState(0)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [mounted, setMounted] = useState(false)
+  let pars: string[] = [];
+  if (summaryText)
+    pars = summaryText.split('\n\n');
+  const summary = pars[0];         // First paragraph is the summary
+  const keypoints = pars.slice(1); // The rest are keypoints
 
   useEffect(() => {
     setMounted(true)
@@ -120,18 +126,39 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
 
         {/* Content title */}
         <div className="mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Understanding ADHD Symptoms</h2>
-          <p className="text-sm text-gray-500">8 min read</p>
+          <h2 className="text-xl font-bold text-gray-800">{title}</h2>
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="summary" className="mb-4" onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="summary">Summary</TabsTrigger>
-            <TabsTrigger value="keypoints">Key Points</TabsTrigger>
+          <TabsList className="flex justify-center gap-4 mb-4">
+          <TabsTrigger value="summary" className="px-4">Summary</TabsTrigger>
+          <TabsTrigger value="keypoints" className="px-4">Key Points</TabsTrigger>
+
           </TabsList>
 
           <TabsContent value="summary" className="space-y-3" data-tab="summary">
+            <div className="bg-gray-30 p-4 rounded-lg">
+              <p className="text-gray-500 text-sm">
+                 {summaryText}
+              </p>
+            </div>
+          </TabsContent>
+
+
+          <TabsContent value="keypoints" className="space-y-3" data-tab="keypoints">
+            {keypoints.map((point, index) => (
+              <div key={index} className="bg-gray-50 p-4 rounded-lg flex items-start">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <span className="text-white text-xs font-bold">{index + 1}</span>
+                </div>
+                <p className="text-gray-800 text-sm">{point}</p>
+              </div>
+            ))}
+          </TabsContent>
+
+
+          {/* <TabsContent value="summary" className="space-y-3" data-tab="summary">
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-gray-800 text-sm">
                  {summaryText}
@@ -186,7 +213,7 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
                 interesting.
               </p>
             </div>
-          </TabsContent>
+          </TabsContent> */}
 
         </Tabs>
 
