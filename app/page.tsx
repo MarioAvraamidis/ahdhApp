@@ -42,6 +42,8 @@ export default function Home() {
   }
 
   const handleBreakdown = async () => {
+
+    setIsProcessing(true) 
     const result = await model.generateContent([
         "Please summarize the video in 3 sentences.",
         {
