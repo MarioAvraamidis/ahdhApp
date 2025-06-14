@@ -53,11 +53,6 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
       keypointElements.forEach((el) => {
         textToSpeak += el.textContent + " "
       })
-    } else {
-      const actionElements = document.querySelectorAll('[data-tab="actions"] li')
-      actionElements.forEach((el) => {
-        textToSpeak += el.textContent + " "
-      })
     }
 
     // Use the Web Speech API for text-to-speech
@@ -134,7 +129,6 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
           <TabsList className="grid grid-cols-3 mb-4">
             <TabsTrigger value="summary">Summary</TabsTrigger>
             <TabsTrigger value="keypoints">Key Points</TabsTrigger>
-            <TabsTrigger value="actions">Actions</TabsTrigger>
           </TabsList>
 
           <TabsContent value="summary" className="space-y-3" data-tab="summary">
@@ -194,39 +188,6 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
             </div>
           </TabsContent>
 
-          <TabsContent value="actions" className="space-y-3" data-tab="actions">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-medium text-gray-800 mb-2 text-sm">Recommended Next Steps</h3>
-              <ul className="space-y-2">
-                <li className="flex items-center">
-                  <div className="w-5 h-5 border border-blue-500 rounded-full mr-2 flex-shrink-0"></div>
-                  <span className="text-gray-700 text-sm">Schedule assessment with healthcare provider</span>
-                </li>
-                <li className="flex items-center">
-                  <div className="w-5 h-5 border border-blue-500 rounded-full mr-2 flex-shrink-0"></div>
-                  <span className="text-gray-700 text-sm">Research ADHD specialists in your area</span>
-                </li>
-                <li className="flex items-center">
-                  <div className="w-5 h-5 border border-blue-500 rounded-full mr-2 flex-shrink-0"></div>
-                  <span className="text-gray-700 text-sm">Join support groups for additional resources</span>
-                </li>
-                <li className="flex items-center">
-                  <div className="w-5 h-5 border border-blue-500 rounded-full mr-2 flex-shrink-0"></div>
-                  <span className="text-gray-700 text-sm">Implement suggested organizational strategies</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-medium text-gray-800 mb-2 text-sm">Helpful Resources</h3>
-              <ul className="space-y-2 text-blue-600 text-sm">
-                <li className="underline">ADHD Self-Assessment Tools</li>
-                <li className="underline">Finding the Right ADHD Medication</li>
-                <li className="underline">Productivity Strategies for ADHD</li>
-                <li className="underline">ADHD and Relationships Guide</li>
-              </ul>
-            </div>
-          </TabsContent>
         </Tabs>
 
         {/* Audio progress bar (only visible when audio is playing) */}
