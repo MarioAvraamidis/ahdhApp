@@ -86,6 +86,7 @@ export default function UploadVideo({ onBack }: UploadVideoProps) {
       video_file  = e.target.files[0]
       setFile(video_file);
       console.log("Handle File:", video_file);
+      runGemini(video_file);
     }
     
   }
