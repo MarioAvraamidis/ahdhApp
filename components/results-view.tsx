@@ -103,9 +103,7 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
           <div className="flex justify-center items-center">
             <Logo size="small" />
           </div>
-          <button className="text-gray-600 p-2">
-            <Share2 className="w-4 h-4" />
-          </button>
+          <div className="p-2 w-6 opacity-0" />
         </div>
   
         {/* Source indicator */}
@@ -122,10 +120,12 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
   
         {/* Tabs */}
         <Tabs defaultValue="summary" className="flex-1 flex flex-col" onValueChange={setActiveTab}>
-          <TabsList className="flex justify-center gap-4 mb-2">
-            <TabsTrigger value="summary" className="px-4">Summary</TabsTrigger>
-            <TabsTrigger value="keypoints" className="px-4">Key Points</TabsTrigger>
-          </TabsList>
+        <TabsList
+  className="inline-flex w-fit mx-auto gap-4 rounded-lg bg-gray-200/80 px-2 py-1"
+>
+  <TabsTrigger value="summary"  className="px-4">Summary</TabsTrigger>
+  <TabsTrigger value="keypoints" className="px-4">Key Points</TabsTrigger>
+</TabsList>
   
           <TabsContent
   value="summary"
@@ -171,7 +171,6 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
 
         </Tabs>
   
-
 
         {/* Audio progress bar */}
         <ClientOnly>
