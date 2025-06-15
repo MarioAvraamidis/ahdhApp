@@ -5,7 +5,6 @@ import { BookOpen, Headphones, Plus, ImageIcon, Video, Music, FileText, Mic, Squ
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import UploadAudio from "@/components/upload-audio"
-import UploadImage from "@/components/upload-image"
 import VoiceRecorder from "@/components/upload-vocal"
 import UploadVideo from "@/components/upload-video"
 
@@ -281,17 +280,6 @@ export default function Home() {
               <Video className="w-5 h-5 text-gray-800" />
               <span className="text-sm">Video</span>
             </button>
-            <button
-  className="flex items-center space-x-2 w-full p-2 hover:bg-gray-50 rounded"
-  onClick={() => {
-    setUploadType("record")
-    setShowMediaMenu(false)
-  }}
->
-  <Mic className="w-5 h-5 text-gray-800" />
-  <span className="text-sm">Voice</span>
-</button>
-
           </div>
         </div>
       )}

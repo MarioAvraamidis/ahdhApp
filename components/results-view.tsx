@@ -127,11 +127,20 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
             <TabsTrigger value="keypoints" className="px-4">Key Points</TabsTrigger>
           </TabsList>
   
-          <TabsContent value="summary" className="flex-1 overflow-y-auto space-y-4 pr-1" data-tab="summary">
-            <div className="bg-gray-30 p-4 rounded-lg">
-              <p className="text-gray-700 text-3xl leading-10">{summary}</p>
-            </div>
-          </TabsContent>
+          <TabsContent
+  value="summary"
+  data-tab="summary"
+  /* full width + full height, add some side padding */
+  className="flex-1 w-full h-full overflow-y-auto px-6"
+>
+  {/* center the block and cap its max width for readability */}
+  <div className="w-full max-w-4xl mx-auto bg-gray-30 p-8 rounded-lg">
+    <p className="text-gray-900 text-3xl leading-loose font-['Verdana']">
+      {summary}
+    </p>
+  </div>
+</TabsContent>
+
   
           
           
@@ -142,13 +151,19 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
       <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
         <span className="text-white text-xs font-bold">{index + 1}</span>
       </div>
-      <p className="text-2xl leading-7 flex flex-wrap">
-        {point.split(" ").map((word, i) => (
-          <span key={i} className="mr-1 flex">
-            <span className="font-bold text-gray-800">{word.charAt(0)}</span>
-            <span className="text-gray-500">{word.slice(1)}</span>
-          </span>
-        ))}
+      <p className="text-2xl leading-7 flex flex-wrap font-['Verdana']">
+      {point.split(" ").map((word, i) => (
+  <span key={i} className="mr-1 flex">
+    <span
+      /* bold only on every 2nd word (i = 1, 3, 5 …) */
+      className={`${i % 2 === 0 ? "font-bold text-gray-900" : "text-gray-900"}`}
+    >
+      {word.charAt(0)}
+    </span>
+    <span className="text-gray-900">{word.slice(1)}</span>
+  </span>
+))}
+
       </p>
     </div>
   ))}
