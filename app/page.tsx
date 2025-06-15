@@ -226,7 +226,7 @@ export default function Home() {
     <Input
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
-      placeholder="Provide a URL or list your tasks and wait"
+      placeholder="Provide a URL and wait"
       className="pr-10 py-6 bg-white border-gray-200 text-black"
     />
     {/* Mic icon (right side, left of +) */}
