@@ -158,7 +158,7 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
         <span className="text-white text-xs font-bold">{index + 1}</span>
       </div>
       <p className="text-2xl leading-7 flex flex-wrap font-['Verdana']">
-      {point.replace(/\*/g,'').split(" ").map((word, i) => (
+      {point.replace(/\*/g,'').trim().split(" ").map((word, i) => (
   <span key={i} className="mr-1 flex">
     <span
       /* bold only on every 2nd word (i = 1, 3, 5 …) */
