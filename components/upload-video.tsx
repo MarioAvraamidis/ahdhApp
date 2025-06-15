@@ -38,7 +38,6 @@ export default function UploadVideo({ onBack }: UploadVideoProps) {
       const droppedFile = e.dataTransfer.files[0]
       if (droppedFile.type.startsWith("video/")) {
         setFile(droppedFile)
-        console.log("Drop File:", droppedFile);
         // runGemini(droppedFile , "Video");
       }
     }

@@ -26,7 +26,7 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
   let pars: string[] = []
   let title;
   let summary;
-  let keypoints;
+  let keypoints = [];
   if (summaryText) {
     if (source === 'Text') {
       pars = summaryText.split('\n\n\n')
