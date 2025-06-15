@@ -134,6 +134,7 @@ export default function Home() {
         if (result){
           // console.log("result loaded");
           summaryText = result;
+          setContentSource("Audio");
         }
       }
       else if (uploadType === "video")
@@ -146,6 +147,7 @@ export default function Home() {
         if (result){
           // console.log("result loaded");
           summaryText = result;
+          setContentSource("Video");
         }
       } else {
         setContentSource("Text")

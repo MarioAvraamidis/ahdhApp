@@ -34,7 +34,6 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
       keypoints = pars[1].split('\n');
     } else {
       pars = summaryText.split('\n\n\n')
-      title = pars[0];
       summary = pars[1];
       keypoints = pars[2]?.split('\n\n') ?? [];
     }
@@ -123,11 +122,7 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
             From {source}
           </span>
         </div>
-  
-        {/* Title */}
-        <div className="mb-2">
-          <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
-        </div>
+
   
         {/* Tabs */}
         <Tabs defaultValue="summary" className="flex-1 flex flex-col" onValueChange={setActiveTab}>
