@@ -10,12 +10,13 @@ interface TextInputProps {
   onTextChange: (text: string) => void
   initialText?: string
 }
-
+export let textSummary : string | null = null;
 export default function TextInput({ onBack, onTextChange, initialText = "" }: TextInputProps) {
   const [text, setText] = useState(initialText)
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value
+    textSummary = newText;
     setText(newText)
     onTextChange(newText)
   }

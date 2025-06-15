@@ -19,6 +19,7 @@ import {runGemini} from "@/lib/gemini";
 import {video_file} from "@/components/upload-video"
 import {mp3_file} from "@/components/upload-audio"
 import { set } from "date-fns";
+import {textSummary} from "@/components/text-input";
 
 import {
   createUserContent,
@@ -146,10 +147,15 @@ export default function Home() {
           // console.log("result loaded");
           summaryText = result;
         }
-      }
-       else {
+      } else {
         setContentSource("Text")
-        const result = await runGemini(inputValue , "Text")
+        if (textSummary) {
+          result = await runGemini(textSummary , "Text")
+        }
+        if (result) {
+          // console.log("result loaded");
+          summaryText = result;
+        }
       }
     }
     setIsProcessing(false)
