@@ -29,10 +29,9 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
   let keypoints;
   if (summaryText) {
     if (source === 'Text') {
-      pars = summaryText.split('---')
+      pars = summaryText.split('\n\n\n')
       summary = pars[0]
-      // keypoints = summary
-      keypoints = []
+      keypoints = pars[1].split('\n');
     } else {
       pars = summaryText.split('\n\n\n')
       title = pars[0];
@@ -164,7 +163,7 @@ export default function ResultsView({ onReset, source = "YouTube" }: ResultsView
         <span className="text-white text-xs font-bold">{index + 1}</span>
       </div>
       <p className="text-2xl leading-7 flex flex-wrap font-['Verdana']">
-      {point.split(" ").map((word, i) => (
+      {point.replace(/\*/g,'').split(" ").map((word, i) => (
   <span key={i} className="mr-1 flex">
     <span
       /* bold only on every 2nd word (i = 1, 3, 5 …) */

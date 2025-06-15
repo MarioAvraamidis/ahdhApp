@@ -79,7 +79,7 @@ export async function runGemini(input: File | string, type: "Video" | "Audio" | 
         } else if (type === "Text") {
             const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
             const result = await model.generateContent([
-            "You are an assistant helping someone with ADHD break down their daily tasks. Given a list of tasks, split each one into smaller, manageable steps. Simplify complex actions, suggest helpful cues or reminders, and keep instructions clear and friendly. Focus on reducing overwhelm and making the day feel more doable. Break down and schedule the following tasks:\n" + input,
+            "Given a text, summarize it in 2-3 sentences. After the summary, add 2 empty lines and then show a list of the most needed keypoints. Each keypoint should be 1 sentence.\n" + input,
                
             ]);
             console.log(result.response.text());
